@@ -26,6 +26,7 @@ async def main():
     await pg.click('#tapBtn'); await pg.wait_for_function(f"{F}.ctx() && {F}.ctx().state==='running'"); await pg.wait_for_timeout(300)
     res['live_ctx']=await pg.evaluate(f"()=>({{sampleRate:{F}.ctx().sampleRate,state:{F}.ctx().state,status:document.getElementById('status').textContent,midiNote:document.getElementById('midiNote').textContent}})")
     # ---- hardware MIDI (simulated Web MIDI port): note on plays immediately, never starts the transport; velocity; CC64; out mirrors
+    await pg.wait_for_function(f"{F}.ctx().currentTime>0.3")  # headless Chromium's audio clock takes a moment to start moving after resume
     await midi(pg,[0x90,57,110]); await pg.wait_for_timeout(100)
     a=await pg.evaluate(f"()=>({{voices:{F}.liveVoices(),playing:!!{F}.play()}})"); a['peak']=await pg.evaluate(PEAK)
     await midi(pg,[0xB0,64,127]); await midi(pg,[0x80,57,0]); await pg.wait_for_timeout(200); sus=await pg.evaluate(f"()=>({{voices:{F}.liveVoices(),sustain:{F}.sustainOn()}})")

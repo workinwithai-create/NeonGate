@@ -8,7 +8,7 @@
  "midi": {
   "note_on_voices": 1,
   "note_on_transport_started": false,
-  "note_on_output_peak": 0.2752,
+  "note_on_output_peak": 0.285,
   "velocity20_peak": 0.1053,
   "sustain_held_after_noteoff": {
    "voices": 1,
@@ -98,7 +98,7 @@
  "c4_live": {
   "recipe_heard_after_s": 0.216,
   "mute_heard_after_s": 0.152,
-  "bpm_heard_after_s": 0.24,
+  "bpm_heard_after_s": 0.251,
   "one_bar_s_at_92": 2.609,
   "steps_continuous_no_restart": true,
   "audio_clock_times_increasing": true,
@@ -108,7 +108,7 @@
   "pass": true
  },
  "stop_silence": {
-  "ms": 61,
+  "ms": 65,
   "peak": 0,
   "live": 0,
   "pass_": true
@@ -132,14 +132,14 @@
   "min_rms_any_half_second": 0.13799,
   "pass": true,
   "live_hold_peaks_every_0.5s": [
-   0.2478,
-   0.2515,
-   0.2162,
-   0.205,
-   0.2903,
-   0.295,
-   0.4686,
-   0.3226
+   0.258,
+   0.237,
+   0.2526,
+   0.2405,
+   0.289,
+   0.2883,
+   0.4608,
+   0.3355
   ]
  },
  "c5_blocked_host": {
