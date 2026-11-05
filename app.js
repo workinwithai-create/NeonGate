@@ -36,7 +36,7 @@ const CHAIRS = [
   { id: "drums", name: "Drum Machine (synth kick, noise clap + hat)", ch: 9 }
 ];
 const DEF = { bpm: 100, keyRoot: 9, mode: "minor", bars: 8, chordsText: "Am F C G", recipe: "trance", pattern: RECIPES.trance.p, glen: 0.55, depth: 1, pump: 0.35, drums: "four",
-  voice: "neonsaw", cutoff: 0.62, reso: 4, atk: 0.01, rel: 0.35, lock: false, quant: true, kbdOct: 4, gains: { gate: 0.8, bass: 0.7, drums: 0.8 }, mutes: { gate: false, bass: false, drums: false },
+  voice: "neonsaw", cutoff: 0.62, reso: 4, atk: 0.01, rel: 0.35, lock: false, quant: true, kbdOct: 3, gains: { gate: 0.8, bass: 0.7, drums: 0.8 }, mutes: { gate: false, bass: false, drums: false },
   midiIn: "", midiOut: "", audioOut: "", take: [] };
 function loadJSON(k){ try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
 const state = Object.assign(JSON.parse(JSON.stringify(DEF)), loadJSON(APP + "-settings") || {});
@@ -249,7 +249,7 @@ function setSetting(k, v){ if (k === "bpm") { v = clamp(Math.round(+v || 100), 6
   else if (k === "bars") { state.bars = +v; const L = state.bars * STEPS; state.take = state.take.filter(n => n.s < L); if (play) play.step = play.step % L; }
   else if (k === "mute") { state.mutes[v[0]] = v[1]; applyMix(); } else if (k === "gain") { state.gains[v[0]] = +v[1]; applyMix(); }
   else state[k] = typeof DEF[k] === "number" ? +v : v;
-  save(); paintAll(); }
+  save(); paintAll(); if (k === "kbdOct") paintKeys(); }
 function transposeAll(d){ const p = parseChords(state.chordsText); if (p.list) state.chordsText = p.list.map(c => (useSharps() ? NAMES_S : NAMES)[pc(c.root + d)] + c.q).join(" "); state.take = state.take.map(n => Object.assign({}, n, { n: clamp(n.n + d, 0, 127) })); }
 const KB = "awsedftgyhujkolp;"; const kbDown = new Set();
 function bind(){ $("key").innerHTML = NAMES.map((n, i) => `<option value="${i}">${n}</option>`).join(""); $("recipe").innerHTML = Object.entries(RECIPES).map(([k, r]) => `<option value="${k}">${esc(r.name)}</option>`).join("") + '<option value="custom" disabled>Custom (edited)</option>';

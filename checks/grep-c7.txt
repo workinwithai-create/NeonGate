@@ -1,11 +1,11 @@
 == @main / @gh-pages in repo ==
 none
 == Math.random in repo ==
-app.js:55:// ---------- deterministic noise (seeded LCG: no Math.random anywhere) ----------
+none
 == sample/CDN URLs (should be none: all voices are synthesized) ==
-app.js:198:async function exportWavBytes(o){ o = o || {}; const r = await renderMix(o); return { bytes: wav24(r.ch, r.N), name: fileBase(r.P) + ".wav", frames: r.N, gain: r.gain, peak: r.peak }; }
+none
 == voice + chair names (each must say synth) ==
 7
 == live https://neongate.vercel.app/app.js ==
-55:// ---------- deterministic noise (seeded LCG: no Math.random anywhere) ----------
-FAIL
+none
+PASS: pinned, deterministic, honestly named
