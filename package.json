@@ -1,0 +1,8 @@
+{
+  "name": "neongate",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NeonGate: a playable cyberpunk gate synth for your MIDI keyboard. Tempo-synced trance gate + sidechain pump, DAW-grid WAV + MIDI export.",
+  "scripts": { "build": "rm -rf dist && mkdir -p dist && cp index.html app.js styles.css dist/" },
+  "license": "UNLICENSED"
+}

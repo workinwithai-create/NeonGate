@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NeonGate · play a gated neon synth on your MIDI keyboard</title>
+<meta name="description" content="A playable cyberpunk gate synth: hold chords on your MIDI keyboard and a tempo-synced trance gate + sidechain pump chops them on the grid. Exports DAW-ready 48k/24 WAV + MIDI.">
+<link rel="stylesheet" href="styles.css"></head>
+<body>
+<div id="tap" class="tap"><div class="tapbox"><h1>NEON<span>GATE</span></h1><p>Hold chords on your MIDI keyboard. The gate chops them on the grid.</p><button id="tapBtn">Tap to start audio</button><p class="small">On iPhone/iPad, turn off the silent switch: it mutes Web Audio.</p></div></div>
+<header><h1>NEON<span>GATE</span></h1><p class="tag">A playable gate synth for your MIDI keyboard. Hold a chord and the trance gate and sidechain pump chop it on the grid of <b>your</b> BPM and key.</p>
+<div id="status" class="status">Tap to start audio.</div></header>
+<main>
+<section class="card song"><h2>1 · Your loop</h2>
+ <div class="row"><label>BPM <input id="bpm" type="number" min="60" max="180" step="1"></label>
+ <label>Key <select id="key"></select></label><label>Mode <select id="mode"><option value="minor">minor</option><option value="major">major</option></select></label>
+ <label>Bars <select id="bars"><option>4</option><option>8</option><option>16</option></select></label>
+ <label class="grow">Chords (one per bar, looped) <input id="chords" placeholder="Am F C G"></label></div>
+ <div id="chordErr" class="err"></div>
+ <p class="small">Your BPM, key and chords are saved in this browser and used for playback and export. Changing the key transposes the chords and your take.</p>
+</section>
+<section class="card play"><h2>2 · Play</h2>
+ <div class="row"><button id="play" class="big">▶ Play gate + band</button><button id="rec" class="rec">● Rec take</button><button id="clear">Clear take</button>
+ <label class="chk"><input id="quant" type="checkbox"> Snap take to 1/16</label><span id="pos" class="pos">bar – · step –</span></div>
+ <div id="steps" class="steps"></div>
+ <p id="takeInfo" class="small"></p>
+ <div id="keys" class="keys"></div>
+ <p class="small">Your MIDI keyboard plays the synth right away and never starts the transport. When the transport is stopped, the gate stays open so you can hear the raw voice. Fallback keys: A W S E D F T G Y H U J K O L P ; (Z / X = octave).</p>
+</section>
+<section class="card gate"><h2>3 · Gate</h2>
+ <div class="row"><label>Gate recipe <select id="recipe"></select></label>
+ <label>Depth <input id="depth" type="range" min="0" max="1" step="0.01"><span id="depth_v"></span></label>
+ <label>Length <input id="glen" type="range" min="0.1" max="1" step="0.01"><span id="glen_v"></span></label>
+ <label>Pump <input id="pump" type="range" min="0" max="0.9" step="0.01"><span id="pump_v"></span></label>
+ <label>Drums <select id="drums"></select></label></div>
+ <div id="grid" class="grid"></div><p id="recipeNote" class="small"></p>
+</section>
+<section class="card voice"><h2>4 · Voice</h2>
+ <div class="row"><label>Voice <select id="voice"></select></label>
+ <label>Cutoff <input id="cutoff" type="range" min="0" max="1" step="0.005"><span id="cutoff_v"></span></label>
+ <label>Resonance <input id="reso" type="range" min="0" max="18" step="0.1"><span id="reso_v"></span></label>
+ <label>Attack <input id="atk" type="range" min="0.002" max="1.5" step="0.001"><span id="atk_v"></span></label>
+ <label>Release <input id="rel" type="range" min="0.01" max="2.5" step="0.01"><span id="rel_v"></span></label>
+ <label class="chk"><input id="lock" type="checkbox"> Scale lock (snap keys to your key)</label></div>
+ <p id="voiceNote" class="small"></p>
+ <h3>Mix</h3><div id="mix" class="mix"></div>
+</section>
+<section class="card io"><h2>5 · MIDI + audio</h2>
+ <div class="row"><label>MIDI in <select id="midiIn"></select></label><label>MIDI out <select id="midiOut"></select></label>
+ <label>Audio out <select id="audioOut"></select></label></div>
+ <p id="midiNote" class="small"></p><p id="audioOutNote" class="small"></p><p id="midiLast" class="small mono"></p>
+ <p class="small">Controls: notes + velocity · CC64 sustain · CC1 mod wheel = gate depth · CC74 = cutoff · pitch bend ±2 · CC123 all notes off. MIDI out mirrors what you play (ch 1), the bass (ch 2) and drums (ch 10). No audio input is used.</p>
+</section>
+<section class="card exp"><h2>6 · Export (drops on bar 1 of your DAW)</h2>
+ <div class="row"><button id="wav">Export WAV</button><button id="mid">Export MIDI</button></div>
+ <progress id="expProg" hidden max="1" value="0"></progress><p id="expMsg" class="expmsg"></p>
+ <p class="small">48 kHz / 24-bit stereo, exactly your bars at your BPM, downbeat at sample 0, ring-out folded into the start so it loops, peak ≤ −1 dBFS. The WAV plays your take (or your chords held one per bar if you haven't recorded one) through the gate. MIDI: tempo, 4/4, key, one track per chair (Gate Synth held notes, Gate Synth gated notes, Sub Bass, Drums).</p>
+ <div class="lic"><button id="buy" disabled>Checkout opening soon</button><input id="licKey" placeholder="License key"><button id="licBtn">Unlock</button><p id="licState" class="small"></p></div>
+</section>
+<p class="foot">Every sound in NeonGate is synthesized in your browser and named as a synth. No samples, no accounts, no tracking. © 2026 WorkinWithAI.</p>
+</main>
+<script src="app.js"></script>
+</body></html>
