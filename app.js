@@ -52,7 +52,7 @@ const chordAt = bar => { const l = songChords(); return l[bar % l.length]; };
 function voicing(c, lo, hi){ const ivs = QUAL[c.q] || QUAL[""], out = []; for (const i of ivs.slice(0, 4)) { let n = c.root + i; while (n < lo) n += 12; while (n > hi) n -= 12; out.push(n); } return [...new Set(out)].sort((a, b) => a - b); }
 const keyLabel = () => NAMES[state.keyRoot] + (state.mode === "minor" ? "m" : "");
 function lockNote(n){ if (!state.lock) return n; const sc = SCALE[state.mode].map(i => pc(i + state.keyRoot)); for (let d = 0; d < 6; d++) { if (sc.includes(pc(n - d))) return n - d; if (sc.includes(pc(n + d))) return n + d; } return n; }
-// ---------- deterministic noise (seeded LCG: no Math.random anywhere) ----------
+// ---------- deterministic noise (seeded LCG, so exports are identical every time) ----------
 const noiseCache = new Map();
 function noiseBuf(c){ if (noiseCache.has(c)) return noiseCache.get(c); const b = c.createBuffer(1, Math.round(c.sampleRate * 0.5), c.sampleRate), d = b.getChannelData(0); let s = 20261105;
   for (let i = 0; i < d.length; i++) { s = (s * 1103515245 + 12345) % 2147483648; d[i] = s / 1073741824 - 1; } noiseCache.set(c, b); return b; }
@@ -163,18 +163,23 @@ const sinkOK = () => typeof (window.AudioContext || function(){}).prototype.setS
 async function listDevices(){ const sel = $("audioOut"); if (!sinkOK()) { sel.innerHTML = '<option value="">System default</option>'; sel.disabled = true; $("audioOutNote").textContent = "This browser can't route Web Audio to a chosen device (no setSinkId), so sound uses your system output."; return; }
   let devs = []; try { devs = await navigator.mediaDevices.enumerateDevices(); } catch (e) {} const outs = devs.filter(d => d.kind === "audiooutput" && d.deviceId !== "default");
   sel.innerHTML = '<option value="">System default</option>' + outs.map((d, i) => `<option value="${esc(d.deviceId)}">${esc(d.label || "Output " + (i + 1))}</option>`).join(""); sel.value = outs.some(d => d.deviceId === state.audioOut) ? state.audioOut : ""; }
-async function applySink(){ if (!ctx || !sinkOK()) return; try { await ctx.setSinkId(state.audioOut || ""); $("audioOutNote").textContent = state.audioOut ? "Playing through the selected output." : "Playing through the system default output."; } catch (e) { $("audioOutNote").textContent = "That output couldn't be used, so sound stays on the system default."; } }
+async function applySink(){ if (!ctx || !sinkOK()) return; if (!state.audioOut && !(typeof ctx.sinkId === "string" && ctx.sinkId)) { $("audioOutNote").textContent = "Playing through the system default output."; return; } try { await ctx.setSinkId(state.audioOut || ""); $("audioOutNote").textContent = state.audioOut ? "Playing through the selected output." : "Playing through the system default output."; } catch (e) { $("audioOutNote").textContent = "That output couldn't be used, so sound stays on the system default."; } }
 // ---------- export: OfflineAudioContext, downbeat at sample 0, exact length, tail folded, peak <= -1 dBFS ----------
 const snapState = () => JSON.parse(JSON.stringify(state));
+// The limiter (DynamicsCompressorNode) delays audio by a fixed look-ahead (6 ms in Chrome). Measure it once with an impulse and
+// read the render from that offset, so the first downbeat of every export is at sample 0.
+let compLat = null;
+async function compLatency(){ if (compLat != null) return compLat; const oc = new OfflineAudioContext(1, 4096, SR), b = oc.createBuffer(1, 1, SR); b.getChannelData(0)[0] = 0.5; const s = oc.createBufferSource(); s.buffer = b;
+  const B = buildBus(oc); s.connect(B.chairs.drums); B.chairs.drums.gain.value = 1; s.start(0); const r = (await oc.startRendering()).getChannelData(0); let bi = 0; for (let i = 0; i < r.length; i++) if (Math.abs(r[i]) > Math.abs(r[bi])) bi = i; compLat = bi; return bi; }
 async function renderMix(o){ o = o || {}; const P = Object.assign(snapState(), o.override || {}), sd = 60 / P.bpm / 4, L = P.bars * STEPS, N = Math.round(P.bars * 4 * 60 / P.bpm * SR);
   const notes = gateNotes(P); let lastEnd = N / SR; for (const n of notes) lastEnd = Math.max(lastEnd, (n.s + n.d) * sd); const tailS = Math.max(0, lastEnd - N / SR) + Math.max(MIN_REL, P.rel) + 0.8, total = N + Math.ceil(tailS * SR);
-  const oc = new OfflineAudioContext(2, total, SR); const saved = state.mutes; const B = (function(){ const prev = state.mutes; state.mutes = o.only ? Object.fromEntries(CHAIRS.map(c => [c.id, !o.only.includes(c.id)])) : P.mutes; const b = buildBus(oc); state.mutes = prev; return b; })();
+  const lat = await compLatency(), oc = new OfflineAudioContext(2, total + lat, SR); const saved = state.mutes; const B = (function(){ const prev = state.mutes; state.mutes = o.only ? Object.fromEntries(CHAIRS.map(c => [c.id, !o.only.includes(c.id)])) : P.mutes; const b = buildBus(oc); state.mutes = prev; return b; })();
   const mutes = o.only ? Object.fromEntries(CHAIRS.map(c => [c.id, !o.only.includes(c.id)])) : P.mutes;
   B.gate.gain.setValueAtTime(P.pattern[0] === "1" ? 1 : 1 - P.depth, 0); B.pumpG.gain.setValueAtTime(1, 0); B.pumpB.gain.setValueAtTime(1, 0);
   const totalSteps = Math.ceil(total / SR / sd) + 1; for (let k = 0; k < totalSteps; k++) { const t = k * sd; gateStep(B.gate.gain, P, k, t, sd); pumpStep(B.pumpG.gain, P, k, t, sd); pumpStep(B.pumpB.gain, P, k, t, sd); }
   for (let k = 0; k < L; k++) { const t = k * sd; for (const e of bandEventsAt(P, k)) { if (mutes[e.ch]) continue; if (e.ch === "drums") drumHit(oc, B.drumIn, e.kind, e.v, t); else bassNote(oc, B.bassIn, e.n, e.v, t, e.d * sd); } }
   if (!mutes.gate) for (const n of notes) { const t = n.s * sd, v = synthVoice(oc, B.voiceIn, n.n, n.v, t, P); v.release(t + n.d * sd); }
-  const buf = await oc.startRendering(), ch = [0, 1].map(c => { const src = buf.getChannelData(c), out = new Float32Array(N); out.set(src.subarray(0, N)); if (!o.noFold) for (let i = N; i < src.length; i++) out[(i - N) % N] += src[i]; return out; });
+  const buf = await oc.startRendering(), ch = [0, 1].map(c => { const src = buf.getChannelData(c).subarray(lat), out = new Float32Array(N); out.set(src.subarray(0, N)); if (!o.noFold) for (let i = N; i < src.length; i++) out[(i - N) % N] += src[i]; return out; });
   let pk = 0; for (const x of ch) for (let i = 0; i < N; i++) pk = Math.max(pk, Math.abs(x[i])); const g = o.gain != null ? o.gain : pk > 0 ? Math.pow(10, -1.1 / 20) / pk : 1; for (const x of ch) for (let i = 0; i < N; i++) x[i] *= g;
   return { ch, N, gain: g, peak: pk, P }; }
 function wav24(ch, N){ const nc = ch.length, ba = nc * 3, buf = new ArrayBuffer(44 + N * ba), dv = new DataView(buf), w = (o, s) => { for (let i = 0; i < s.length; i++) dv.setUint8(o + i, s.charCodeAt(i)); };

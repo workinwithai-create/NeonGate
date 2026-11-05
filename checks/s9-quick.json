@@ -1,0 +1,197 @@
+{
+ "live_ctx": {
+  "sampleRate": 48000,
+  "state": "running",
+  "status": "Audio on. Play your MIDI keyboard, or press Play to run the gate + band.",
+  "midiNote": "MIDI keyboard: Mock Keys 49. Play it: notes, velocity, sustain, mod wheel and pitch bend all work."
+ },
+ "midi": {
+  "note_on_voices": 1,
+  "note_on_transport_started": false,
+  "note_on_output_peak": 0.1946,
+  "velocity20_peak": 0.088,
+  "sustain_held_after_noteoff": {
+   "voices": 1,
+   "sustain": true
+  },
+  "voices_after_cc64_up": 0,
+  "cc1_64_depth": 0.5,
+  "clock_start_msgs_start_transport": false,
+  "midi_out_sent": [
+   [
+    144,
+    64,
+    90
+   ],
+   [
+    128,
+    64,
+    0
+   ]
+  ],
+  "selects": {
+   "in": [
+    "(none)",
+    "Mock Keys 49"
+   ],
+   "out": [
+    "(none)",
+    "Mock Synth Out"
+   ],
+   "audioOut": [
+    "System default",
+    "Output 1"
+   ]
+  },
+  "pass": true
+ },
+ "c1_export": {
+  "file": "neongate-trance-92bpm-Am.wav",
+  "frames": 1001739,
+  "expected": 1001739,
+  "sr": 48000,
+  "bits": 24,
+  "channels": 2,
+  "peak_dBFS": -1.1,
+  "first_transient_sample": 303,
+  "first_transient_ms": 6.312,
+  "pass": false
+ },
+ "c2_loop": {
+  "seam_jump": 0.0,
+  "p99_9_step": 0.25121,
+  "median_step": 0.005247,
+  "kick_onset_vs_bar_line_samples_4x": [
+   289,
+   290,
+   291
+  ],
+  "bar_len_samples": 125217.375,
+  "note": "4x tiled export; drums-only render shares the exact same grid",
+  "pass": false
+ },
+ "midi_file": {
+  "file": "neongate-trance-92bpm-Am.mid",
+  "type": 1,
+  "tracks": [
+   "NeonGate 92 BPM neongate-trance-92bpm-Am",
+   "Gate Synth (held notes)",
+   "Gate Synth (gated: Trance 16ths)",
+   "Sub Bass",
+   "Drum Machine"
+  ],
+  "tempo_bpm": [
+   92.0
+  ],
+  "timesig": [
+   [
+    4,
+    4
+   ]
+  ],
+  "track_len_ticks": [
+   15360
+  ],
+  "expected_ticks": 15360,
+  "pass": true
+ },
+ "c4_live": {
+  "recipe_heard_after_s": 0.226,
+  "mute_heard_after_s": 0.152,
+  "bpm_heard_after_s": 0.251,
+  "one_bar_s_at_92": 2.609,
+  "steps_continuous_no_restart": true,
+  "audio_clock_times_increasing": true,
+  "gate_follows_current_pattern_every_step": true,
+  "steps_logged": 37,
+  "stop_clears_transport": true,
+  "pass": true
+ },
+ "stop_silence": {
+  "ms": 61.19999998807907,
+  "peak": 0,
+  "live": 0,
+  "pass_": true
+ },
+ "c3_hidden": {
+  "hidden_for_s": 3,
+  "steps_scheduled_after_hide": 0,
+  "playing_after_return": false,
+  "output_peak_after_return": 0,
+  "status": "Stopped because the tab was hidden. Press Play to start again.",
+  "play_button": "\u25b6 Play gate + band",
+  "pass": true
+ },
+ "c6_sustain": {
+  "bpm": 60,
+  "note_len_s": 32.0,
+  "frames": 1536000,
+  "rms_at_1s": 0.15211,
+  "rms_last_0.5s": 0.1658,
+  "ratio_last_vs_1s": 1.09,
+  "min_rms_any_half_second": 0.13901,
+  "pass": true,
+  "live_hold_peaks_every_0.5s": [
+   0.2478,
+   0.2515,
+   0.2741,
+   0.205,
+   0.2903,
+   0.295,
+   0.4686,
+   0.3226
+  ]
+ },
+ "c5_blocked_host": {
+  "result": "N/A: no sample host. Every voice is synthesized in the browser and named as a synth, so there is nothing to block.",
+  "third_party_hosts_requested": [],
+  "requests_blocked_when_all_other_hosts_blocked": [],
+  "plays_with_all_other_hosts_blocked": true,
+  "pass": true
+ },
+ "c7_grep": {
+  "script": "qa/no_unpinned.sh",
+  "exit": 1,
+  "tail": [
+   "FAIL"
+  ],
+  "voice_names": [
+   "Neon Saw (synth: 3 detuned saws)",
+   "Glass Pulse (synth: square + triangle octave)",
+   "Vapor Brass (synth: saws + filter swell)",
+   "Chrome Square (synth: square + sub octave)",
+   "Gate Synth (your keys, synth)",
+   "Sub Bass (synth: sine + saw)",
+   "Drum Machine (synth kick, noise clap + hat)"
+  ],
+  "pass": false
+ },
+ "persist_and_gate": {
+  "after_reload": {
+   "bpm": 60,
+   "recipe": "hold",
+   "bars": 8,
+   "key": 9
+  },
+  "gate": {
+   "gated": false,
+   "buy": "Checkout opening soon \u00b7 $19 once",
+   "lic": "Launch: full exports free until checkout opens. WAV + MIDI at every length (4, 8 or 16 bars). ($19 once when checkout opens.)"
+  },
+  "pass": true
+ },
+ "page_errors": [],
+ "summary": {
+  "midi": true,
+  "c1_export": false,
+  "c2_loop": false,
+  "midi_file": true,
+  "c4_live": true,
+  "stop_silence": true,
+  "c3_hidden": true,
+  "c6_sustain": true,
+  "c5_blocked_host": true,
+  "c7_grep": false,
+  "persist_and_gate": true
+ }
+}
